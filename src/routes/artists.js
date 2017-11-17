@@ -16,11 +16,15 @@ heroes.get('/', async (req, res) => {
   })
 })
 
-heroes.get('/search/:term', async (req, res) => {
-  try {
-    const searchList = await Artist.find({
+heroes.get('/search/(:term|)', async (req, res) => {
+  let filter = {}
+  if (req.params.term) {
+    filter = {
       name: new RegExp(req.params.term, 'i')
-    })
+    }
+  }
+  try {
+    const searchList = await Artist.find(filter)
     res.json({
       status: 'success',
       result: searchList
@@ -33,13 +37,13 @@ heroes.get('/search/:term', async (req, res) => {
   }
 })
 
-// GET: get one hero by its ID
-heroes.get(`/:heroId(${objectIdFilter})`, async (req, res) => {
+// GET: get one artist by its ID
+heroes.get(`/:artistId(${objectIdFilter})`, async (req, res) => {
   try {
-    const hero = await Artist.findById({ _id: req.params.heroId })
+    const artist = await Artist.findById({ _id: req.params.artistId })
     res.json({
       status: 'success',
-      result: hero
+      result: artist
     })
   } catch (error) {
     res.status(400).json({
