@@ -2,13 +2,13 @@ import { Router } from 'express'
 import { Artist } from '../models/artist'
 
 
-const heroes = Router()
+const artists = Router()
 
 // define the mongobd ObjectId filter once for all routes
 const objectIdFilter = "[0-9,a-f]*"
 
-// GET all heroes
-heroes.get('/', async (req, res) => {
+// GET all artists
+artists.get('/', async (req, res) => {
   const artistsList = await Artist.find({})
   res.json({
     status: 'success',
@@ -16,7 +16,7 @@ heroes.get('/', async (req, res) => {
   })
 })
 
-heroes.get('/search/(:term|)', async (req, res) => {
+artists.get('/search/(:term|)', async (req, res) => {
   let filter = {}
   if (req.params.term) {
     filter = {
@@ -38,7 +38,7 @@ heroes.get('/search/(:term|)', async (req, res) => {
 })
 
 // GET: get one artist by its ID
-heroes.get(`/:artistId(${objectIdFilter})`, async (req, res) => {
+artists.get(`/:artistId(${objectIdFilter})`, async (req, res) => {
   try {
     const artist = await Artist.findById({ _id: req.params.artistId })
     res.json({
@@ -54,7 +54,7 @@ heroes.get(`/:artistId(${objectIdFilter})`, async (req, res) => {
 })
 
 // POST: add new hero
-heroes.post('/', async (req, res) => {
+artists.post('/', async (req, res) => {
   try {
     const artist = new Artist(req.body)
     const savedHero = await artist.save()
@@ -71,7 +71,7 @@ heroes.post('/', async (req, res) => {
 })
 
 // PUT: update an existing hero by ID
-heroes.put(`/:artistId(${objectIdFilter})`, async (req, res) => {
+artists.put(`/:artistId(${objectIdFilter})`, async (req, res) => {
   try {
     const artist = await Artist.findOneAndUpdate({ _id: req.params.artistId }, req.body, { new: true })
     res.json({
@@ -87,7 +87,7 @@ heroes.put(`/:artistId(${objectIdFilter})`, async (req, res) => {
 })
 
 // DELETE: remove an existing hero by ID
-heroes.delete(`/:artistId(${objectIdFilter})`, async (req, res) => {
+artists.delete(`/:artistId(${objectIdFilter})`, async (req, res) => {
   try {
     const artist = await Artist.findOneAndRemove({ _id: req.params.artistId })
     if (artist === null) throw new Error('Item does not exist')
@@ -100,4 +100,4 @@ heroes.delete(`/:artistId(${objectIdFilter})`, async (req, res) => {
   }
 })
 
-export default heroes
+export default artists
