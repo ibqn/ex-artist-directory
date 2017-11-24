@@ -26,18 +26,15 @@ artists.get('/search/(:term|)', async (req, res) => {
       }
     }
     // sort by name
-    let field = ('sort' in req.query && ['name', 'reknown'].indexOf(req.query.sort) >= 0) ? req.query.sort : 'name'
-    let order = ('order' in req.query && ['asc', 'desc'].indexOf(req.query.order) >= 0) ? req.query.order : 'asc'
-    /*
-    if ('sort' in req.query && ['name', 'reknown'].indexOf(req.query.sort) >= 0) {
-      field = req.query.sort
-    }
-    if ('order' in req.query && ['asc', 'desc'].indexOf(req.query.order) >= 0) {
-      order = req.query.order
-    }
-    */
-    console.log(`order by '${order}'`)
-    console.log(`sort by '${field}' field`)
+    const field = (
+      'sort' in req.query && ['name', 'reknown'].indexOf(req.query.sort) >= 0
+    ) ? req.query.sort : 'name'
+    const order = (
+      'order' in req.query && ['asc', 'desc'].indexOf(req.query.order) >= 0
+    ) ? req.query.order : 'asc'
+
+    // console.log(`order by '${order}'`)
+    // console.log(`sort by '${field}' field`)
     const sort = { [field]: order }
     const searchList = await Artist.find(filter, null, { sort })
     res.json({
@@ -59,6 +56,51 @@ artists.get(`/:artistId(${objectIdFilter})`, async (req, res) => {
     res.json({
       status: 'success',
       result: artist
+    })
+  } catch (error) {
+    res.status(400).json({
+      status: 'failure',
+      message: error.message
+    })
+  }
+})
+
+// GET: get one item by its ID
+artists.get(`/get/:artistId(${objectIdFilter})`, async (req, res) => {
+  try {
+    const field = (
+      'sort' in req.query && ['name', 'reknown'].indexOf(req.query.sort) >= 0
+    ) ? req.query.sort : 'name'
+    const order = (
+      'order' in req.query && ['asc', 'desc'].indexOf(req.query.order) >= 0
+    ) ? req.query.order : 'asc'
+
+    console.log(`order by '${order}'`)
+    console.log(`sort by '${field}' field`)
+
+    const artist = await Artist.findById({ _id: req.params.artistId })
+
+    const sort = { [field]: order }
+    const prev = await Artist.findOne(
+      { [field]: { $lt: artist.name } },
+      null,
+      { sort }
+    ).sort({[field]: -1}).limit(1)
+    // console.log(`prev elem '${prev}'`)
+    console.log(`prev id '${prev.id}' and name '${prev.name}'`)
+
+    const next = await Artist.findOne(
+      { [field]: { $gt: artist.name } },
+      null,
+      { sort }
+    ).sort({[field]: 1}).limit(1)
+    console.log(`next id '${next.id}' and name '${next.name}'`)
+
+    res.json({
+      status: 'success',
+      result: artist,
+      prevId: prev.id,
+      nextId: next.id
     })
   } catch (error) {
     res.status(400).json({

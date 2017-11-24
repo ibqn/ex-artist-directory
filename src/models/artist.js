@@ -36,6 +36,6 @@ artistSchema.set('toJSON', {
   },
 })
 
-// artistSchema.set('toObject', { virtuals: true })
+artistSchema.set('toObject', { virtuals: true })
 
 export const Artist = mongoose.model('artist', artistSchema)
