@@ -26,36 +26,18 @@ artists.get('/search/(:term|)', async (req, res) => {
       }
     }
     // sort by name
-    let field = 'name'
-    let order = 'asc'
-    if ('sort' in req.query) {
-      switch (req.query.sort) {
-        case 'name':
-          console.log('sort by name')
-          field = 'name'
-          break
-        case 'reknown':
-          console.log('sort by reknown')
-          field = 'reknown'
-          break
-        default:
-          console.log('sort by default')
-      }
+    let field = ('sort' in req.query && ['name', 'reknown'].indexOf(req.query.sort) >= 0) ? req.query.sort : 'name'
+    let order = ('order' in req.query && ['asc', 'desc'].indexOf(req.query.order) >= 0) ? req.query.order : 'asc'
+    /*
+    if ('sort' in req.query && ['name', 'reknown'].indexOf(req.query.sort) >= 0) {
+      field = req.query.sort
     }
-    if ('order' in req.query) {
-      switch (req.query.order) {
-        case 'asc':
-          console.log('order by asc')
-          order = 'asc'
-          break
-        case 'desc':
-          console.log('order by desc')
-          order = 'desc'
-          break
-        default:
-          console.log('order by default')
-      }
+    if ('order' in req.query && ['asc', 'desc'].indexOf(req.query.order) >= 0) {
+      order = req.query.order
     }
+    */
+    console.log(`order by '${order}'`)
+    console.log(`sort by '${field}' field`)
     const sort = { [field]: order }
     const searchList = await Artist.find(filter, null, { sort })
     res.json({
