@@ -85,22 +85,28 @@ artists.get(`/get/:artistId(${objectIdFilter})`, async (req, res) => {
       { [field]: { $lt: artist.name } },
       null,
       { sort }
-    ).sort({[field]: -1}).limit(1)
+    ).sort({ [field]: -1 }).limit(1)
     // console.log(`prev elem '${prev}'`)
-    console.log(`prev id '${prev.id}' and name '${prev.name}'`)
+    // console.log(`prev id '${prev.id}' and name '${prev.name}'`)
 
     const next = await Artist.findOne(
       { [field]: { $gt: artist.name } },
       null,
       { sort }
-    ).sort({[field]: 1}).limit(1)
-    console.log(`next id '${next.id}' and name '${next.name}'`)
+    ).sort({ [field]: 1 }).limit(1)
+    // console.log(`next id '${next.id}' and name '${next.name}'`)
+    let prevId = prev && prev.id
+    let nextId = next && next.id
+    if (order !== 'asc') {
+      prevId = next && next.id
+      nextId = prev && prev.id
+    }
 
     res.json({
       status: 'success',
       result: artist,
-      prevId: prev.id,
-      nextId: next.id
+      prevId: prevId,
+      nextId: nextId,
     })
   } catch (error) {
     res.status(400).json({
