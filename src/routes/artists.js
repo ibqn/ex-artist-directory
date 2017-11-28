@@ -68,6 +68,7 @@ artists.get(`/:artistId(${objectIdFilter})`, async (req, res) => {
 // GET: get one item by its ID
 artists.get(`/get/:artistId(${objectIdFilter})`, async (req, res) => {
   try {
+    const query = 'query' in req.query ? new RegExp(req.params.term, 'i') : {}
     const field = (
       'sort' in req.query && ['name', 'reknown'].indexOf(req.query.sort) >= 0
     ) ? req.query.sort : 'name'
@@ -82,7 +83,7 @@ artists.get(`/get/:artistId(${objectIdFilter})`, async (req, res) => {
 
     const sort = { [field]: order }
     const prev = await Artist.findOne(
-      { [field]: { $lt: artist.name } },
+      { name: query, [field]: { $lt: artist.name } },
       null,
       { sort }
     ).sort({ [field]: -1 }).limit(1)
@@ -90,7 +91,7 @@ artists.get(`/get/:artistId(${objectIdFilter})`, async (req, res) => {
     // console.log(`prev id '${prev.id}' and name '${prev.name}'`)
 
     const next = await Artist.findOne(
-      { [field]: { $gt: artist.name } },
+      { name: query, [field]: { $gt: artist.name } },
       null,
       { sort }
     ).sort({ [field]: 1 }).limit(1)
@@ -104,7 +105,7 @@ artists.get(`/get/:artistId(${objectIdFilter})`, async (req, res) => {
 
     res.json({
       status: 'success',
-      result: artist,
+      artist: artist,
       prevId: prevId,
       nextId: nextId,
     })
